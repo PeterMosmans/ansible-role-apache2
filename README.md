@@ -1,10 +1,11 @@
 Ansible Role: Apache2
 =========
 
-This role installs Apache2 on Debian Jessie servers. The focus is on hardening a default Apache installation.
+This role installs and configures Apache2 on Debian Jessie servers. The focus is on hardening a default Apache installation.
 It modifies the default Apache configuration, disables and enables specific modules.
-By default, the default website configuration will be disabled, and content of the default site (/var/www/html) will be **removed**.
 Furthermore it can deploy (a number of) website configuration files, SSL certificates and corresponding private keys.
+
+By default, the default website configuration will be disabled, and content of the default site (/var/www/html) will be **removed**.
 
 Requirements
 ------------
@@ -15,6 +16,7 @@ Role Variables
 --------------
 
 Available variables are listed below, along with default values
+**apache2_modules_disabled**: A list with Apache modules which will be disabled by default. The defaults can be found in ```defaults/main.yml```.
 ```
 apache2_modules_disabled:
   - autoindex
@@ -27,8 +29,10 @@ apache2_modules_disabled:
   - status
   - userdir
 ```
-**apache2_modules_disabled**: A list with Apache modules which will be disabled by default. The defaults can be found in ```defaults/main.yml```.
 
+
+
+**apache2_modules_enabled**: A list with Apache modules which will be enabled by default. The defaults can be found in ```defaults/main.yml```.
 ```
 apache2_modules_enabled:
   - alias
@@ -41,8 +45,10 @@ apache2_modules_enabled:
   - rewrite
   - ssl
 ```
-**apache2_modules_enabled**:A list with Apache modules which will be enabled by default. The defaults can be found in ```defaults/main.yml```.
 
+
+
+**apache2_security_conf**: A list with security.conf settings which will be enabled by default. The defaults can be found in ```defaults/main.yml``.
 ```
 apache2_security_conf:
   - name: "Header set X-Content-Type-Options:"
@@ -58,38 +64,48 @@ apache2_security_conf:
   - name: "TraceEnable"
     value: "Off"
 ```
-**apache2_security_conf**: A list with security.conf settings which will be enabled by default. The defaults can be found in ```defaults/main.yml``.
 
 
+
+**apache2_websites**: An optional list of website configuration files. The ```apache2_website```.conf files are assumed to be in the folder defined by ```protected_storage```.
 ```
 apache2_websites: []
 ```
-**apache2_websites**: An optional list of website configuration files. The ```apache2_website```.conf files are assumed to be in the folder defined by ```protected_storage```.
 
+
+
+**protected_storage**: A location accessible by the Ansible server where the optional configuration files ```apache2_website```.conf, SSL certificates ```ssl_certificates```.cer and the corresponding private keys ```ssl_certificates```.key are stored. It is strongly advised to use a path outside the Ansible 'root' to a secure storage space, and not store important files like private keys in the default location.
 ```
 protected_storage:  ../files
 ```
-**protected_storage**: A location accessible by the Ansible server where the optional configuration files ```apache2_website```.conf, SSL certificates ```ssl_certificates```.cer and the corresponding private keys ```ssl_certificates```.key are stored. It is strongly advised to use a path outside the Ansible 'root' to a secure storage space, and not store important files like private keys in the default location.
 
+
+
+**ssl_certificates**: An optional list of certificates and private keys which will be deployed. The ```ssl_certificates```.key as well as ```ssl_certificates```.cer are assumed to be in the folder defined by ```protected_storage```.
 ```
 ssl_certificates: []
 ```
-**ssl_certificates**: An optional list of certificates and private keys which will be deployed. The ```ssl_certificates```.key as well as ```ssl_certificates```.cer are assumed to be in the folder defined by ```protected_storage```.
 
 
+
+**www_folder**: The default root where website directories are stored.
 ```
 www_folder: /var/www
 ```
-**www_folder**: The default root where website directories are stored.
 
 
-Please note that this role doesn't template Apache configurations. It expects the configurations in the folder```protected_storage``` under the name ```apache2_website```.conf
+
+
+Please note that this role doesn't template Apache configurations, it copies them. It expects the configurations in the folder```protected_storage``` under the name ```apache2_website```.conf
+
 
 
 Dependencies
 ------------
 
-None - although ufw has to be installed.
+ufw has to be installed.
+
+
 
 Example Playbook
 ----------------
@@ -99,15 +115,29 @@ Example Playbook
   become_method: sudo  
   roles:
     - role: PeterMosmans.apache2
+```
+This example will install and harden apache.
+
+
+```
+- hosts: all
+  become: yes
+  become_method: sudo  
+  roles:
+    - role: PeterMosmans.apache2
       apache2_websites:
         - kanboard
 ```
-This example will deploy the file ```kanboard.conf``` from the folder ```protected_storage``` and enable the website.
+This example will install and harden apache, deploy the file ```kanboard.conf``` from the folder ```protected_storage``` and enable the website.
+
+
+
 
 License
 -------
 
 GPLv3
+
 
 Author Information
 ------------------
