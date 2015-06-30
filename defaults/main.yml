@@ -1,0 +1,39 @@
+---
+# defaults file for apache2
+
+apache2_modules_disabled:
+  - autoindex
+  - authn_anon
+  - cgi
+  - dav
+  - env
+  - negotiation
+  - setenvif
+  - status
+  - userdir
+apache2_modules_enabled:
+  - alias
+  - auth_digest
+  - authz_host
+  - deflate
+  - dir
+  - headers
+  - reqtimeout
+  - rewrite
+  - ssl
+apache2_security_conf:
+  - name: "Header set X-Content-Type-Options:"
+    value: "\"nosniff\""
+  - name: "Header set X-Frame-Options:"
+    value: "\"sameorigin\""
+  - name: "ServerName"
+    value: "{{ ansible_fqdn }}"
+  - name: "ServerTokens"
+    value: "Prod"
+  - name: "ServerSignature"
+    value: "Off"
+  - name: "TraceEnable"
+    value: "Off"
+protected_storage: ../files
+www_folder: /var/www
+

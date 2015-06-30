@@ -1,0 +1,117 @@
+---
+# file: roles/apache2/tasks/main.yml
+
+- name: Install apache2
+  apt:
+    name=apache2
+    update_cache=yes
+    cache_valid_time=86400
+    install-recommends=no
+    state=present
+
+- name: Harden Apache security configuration
+  lineinfile:
+    dest=/etc/apache2/conf-available/security.conf
+    regexp="^{{ item.name }}"
+    line="{{ item.name }} {{ item.value }}"
+    state=present
+  with_items: "{{ apache2_security_conf }}"
+  notify:
+    - restart apache2
+  tags:
+    - harden
+
+- name: Enable Apache security configuration
+  command:
+    a2enconf security.conf
+    creates=/etc/apache2/conf-enabled/security.conf
+  notify:
+    - reload apache2
+
+- name: Disable the default sites
+  command:
+    a2dissite 000-default
+    removes=/etc/apache2/sites-enabled/000-default
+  notify: 
+    - restart apache2
+  tags:
+    - harden
+
+- name: Remove content of default site
+  file:
+    path={{ www_folder }}/html
+    state=absent
+  tags:
+    - harden
+
+- name: Disable Apache modules
+  command:
+    a2dismod -f {{ item }}
+    removes=/etc/apache2/mods-enabled/{{ item }}
+#  apache2_module:
+#    name={{ item }}
+#    force_disable=yes
+#    state=absent
+    
+  with_items: "{{ apache2_modules_disabled|default([]) }}"
+  notify: 
+    - restart apache2
+  tags:
+    - harden
+
+- name: Enable Apache modules
+  apache2_module:
+    name={{ item }}
+    state=present
+  with_items: "{{ apache2_modules_enabled|default([]) }}"
+  notify: 
+    - restart apache2
+  tags:
+    - harden
+- name: Deploy Apache configuration files
+  copy:
+    src={{ protected_storage }}/{{ item }}.conf
+    dest=/etc/apache2/sites-available/{{ item }}.conf
+    owner=root
+    group=root
+    mode=640
+  with_items: "{{ apache2_websites|default([]) }}"
+
+- name: Deploy SSL certificates
+  copy:
+    src={{ protected_storage }}/{{ item }}.cer
+    dest=/etc/ssl/certs/{{ item }}.cer
+    owner=root
+    group=root
+    mode=644
+    force=yes
+  with_items: "{{ ssl_certificates|default([]) }}"
+
+- name: Deploy private keys
+  copy:
+    src={{ protected_storage }}/{{ item }}.key
+    dest=/etc/ssl/private/{{ item }}.key
+    owner=root
+    group=root
+    mode=600
+    force=yes
+  with_items: "{{ ssl_certificates|default([]) }}"
+
+- name: Enable websites
+  command:
+    a2ensite {{ item }}.conf
+    creates=/etc/apache2/sites-enabled/{{ item }}.conf
+  with_items: "{{ apache2_websites|default([]) }}"
+  notify:
+    - reload apache2
+
+- name: Allow http and https through firewall
+  ufw:
+    rule=allow
+    proto=tcp
+    port={{ item }}
+  with_items:
+    - 80
+    - 443
+  notify:
+    - reload ufw
