@@ -97,6 +97,32 @@
     force=yes
   with_items: "{{ ssl_certificates|default([]) }}"
 
+- name: Install php5
+  apt:
+    name=php5
+    update_cache=yes
+    cache_valid_time=86400
+    install-recommends=no
+    state=present
+  when: apache2_php is defined and apache2_php
+
+- name: Harden PHP configuration
+  lineinfile:
+    dest=/etc/php5/apache2/php.ini
+    regexp="^{{ item.name }}"
+    line="{{ item.name }} = {{ item.value }}"
+    state=present
+  with_items: "{{ apache2_php_ini }}"
+  notify:
+    - restart apache2
+  when: apache2_php is defined and apache2_php
+
+- name: Enable php5 module
+  apache2_module: name=php5 state=present
+  notify:
+    - restart apache2
+  when: apache2_php is defined and apache2_php
+  
 - name: Enable websites
   command:
     a2ensite {{ item }}.conf
