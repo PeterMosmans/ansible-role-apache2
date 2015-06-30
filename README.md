@@ -88,11 +88,11 @@ Please note that this role doesn't template Apache configurations. It expects th
 Dependencies
 ------------
 
-None - althoug ufw has to be installed.
+None - although ufw has to be installed.
 
 Example Playbook
 ----------------
-
+```
 - hosts: all
   become: yes
   become_method: sudo  
@@ -100,7 +100,7 @@ Example Playbook
     - role: PeterMosmans.apache2
       apache2_websites:
         - kanboard
-
+```
 This example will deploy the file ```kanboard.conf``` from the folder```protected_storage``` and enable the website.
 
 License
