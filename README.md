@@ -1,8 +1,8 @@
 Ansible Role: Apache2
 =========
 
-This role installs and configures Apache2 on Debian Jessie servers. The focus is on hardening a default Apache installation.
-It modifies the default Apache configuration, disables and enables specific modules.
+This role installs and configures Apache2 on Debian Jessie servers. The main focus is on **hardening a default Apache installation**.
+It modifies the default Apache configuration as well as disables and enables specific modules.
 Furthermore it can deploy (a number of) website configuration files, SSL certificates and corresponding private keys.
 
 By default, the default website configuration will be disabled, and content of the default site (/var/www/html) will be **removed**.
@@ -16,6 +16,8 @@ Role Variables
 --------------
 
 Available variables are listed below, along with default values
+
+
 **apache2_modules_disabled**: A list with Apache modules which will be disabled by default. The defaults can be found in ```defaults/main.yml```.
 ```
 apache2_modules_disabled:
@@ -48,7 +50,7 @@ apache2_modules_enabled:
 
 
 
-**apache2_security_conf**: A list with security.conf settings which will be enabled by default. The defaults can be found in ```defaults/main.yml``.
+**apache2_security_conf**: A list with security.conf settings which will be enabled by default. The defaults can be found in ```defaults/main.yml```.
 ```
 apache2_security_conf:
   - name: "Header set X-Content-Type-Options:"
