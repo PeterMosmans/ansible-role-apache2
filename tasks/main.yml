@@ -68,14 +68,17 @@
     - restart apache2
   tags:
     - harden
+
 - name: Deploy Apache configuration files
   copy:
-    src={{ protected_storage }}/{{ item }}.conf
-    dest=/etc/apache2/sites-available/{{ item }}.conf
+    src={{ item.src }}/{{ item.name }}
+    dest=/etc/apache2/sites-available/{{ item.name }}
     owner=root
     group=root
     mode=640
   with_items: "{{ apache2_websites|default([]) }}"
+  tags:
+    - deploy
 
 - name: Deploy SSL certificates
   copy:
@@ -125,8 +128,8 @@
   
 - name: Enable websites
   command:
-    a2ensite {{ item }}.conf
-    creates=/etc/apache2/sites-enabled/{{ item }}.conf
+    a2ensite {{ item.name }}
+    creates=/etc/apache2/sites-enabled/{{ item.name }}
   with_items: "{{ apache2_websites|default([]) }}"
   notify:
     - reload apache2

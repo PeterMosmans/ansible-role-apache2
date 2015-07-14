@@ -4,7 +4,8 @@ Ansible Role: Apache2
 This role installs and configures the Apache 2 webserver on Debian Jessie servers. The main focus is on **hardening a default Apache installation**.
 It modifies the default Apache configuration as well as disables and enables specific modules.
 Furthermore it can deploy (a number of) website configuration files, SSL certificates and corresponding private keys.
-By setting the ```apache2_php``` flag to true, PHP5 will also be installed and configured. Note that it will not be removed or disabled by setting the ```apache2_php``` flag to false. This can be done for instance by adding the php module to the ```apache2_modules_disabled``` list.
+By setting the ```apache2_php``` flag to true, PHP5 will also be installed and configured.
+Note that it will not be removed or disabled by setting the ```apache2_php``` flag to false. This can be done for instance by adding the php module to the ```apache2_modules_disabled``` list.
 
 By default, the default website configuration will be disabled, and content of the default site (/var/www/html) will be **removed**.
 
@@ -106,28 +107,44 @@ apache2_security_conf:
 
 
 
-**apache2_websites**: An optional list of website configuration files. The ```apache2_website```.conf files are assumed to be in the folder defined by ```protected_storage```.
+**apache2_websites**: An optional list containing the location (```src```) and name (```name```) of website configuration files. Please note that the location is relative from the apache2 ```role/files``` subfolder. For instance, if you want to include a file from within another role ```myrole/files```, you should use the following:
 ```
-apache2_websites: []
+apache2_websites:
+  - src: ../../myrole/files
+    name: www.mysite.com.conf
+
+
 ```
+By default, the list is empty.
 
 
 
-**protected_storage**: A location accessible by the Ansible server where the optional configuration files ```apache2_website```.conf, SSL certificates ```ssl_certificates```.cer and the corresponding private keys ```ssl_certificates```.key are stored. It is strongly advised to use a path outside the Ansible 'root' to a secure storage space, and not store important files like private keys in the default location.
+
+**ssl_certificates**: An optional list containing the location (```src```) and name (```name```) of x.509 SSL certificates. Please note that the location is relative from the apache2 ```role/files``` subfolder. For instance, if you want to include a certificate from within a secure storage path, you should use the following:
 ```
-protected_storage:  ../files
+ssl_certificates:
+  - src: /secure/storage/path
+    name: www.mysite.com.cer
+
+
 ```
+By default, the list is empty.
 
 
 
-**ssl_certificates**: An optional list of certificates and private keys which will be deployed. The ```ssl_certificates```.key as well as ```ssl_certificates```.cer are assumed to be in the folder defined by ```protected_storage```.
+
+**ssl_keys**: An optional list containing the location (```src```) and name (```name```) of private keys. Please note that the location is relative from the apache2 ```role/files``` subfolder. For instance, if you want to include a key from within a secure storage path, you should use the following:
 ```
-ssl_certificates: []
+ssl_certificates:
+  - src: /secure/storage/path
+    name: www.mysite.com.key
 ```
+By default, the list is empty.
 
 
 
-**www_folder**: The default root where website directories are stored.
+
+**www_folder**: The default root under which website directories are stored.
 ```
 www_folder: /var/www
 ```
@@ -135,7 +152,7 @@ www_folder: /var/www
 
 
 
-Please note that this role doesn't template Apache configurations, it copies them. It expects the configurations in the folder```protected_storage``` under the name ```apache2_website```.conf
+Please note that this role doesn't template Apache configurations - it copies configuration files.
 
 
 
@@ -165,12 +182,13 @@ This example will install and harden Apache.
   roles:
     - role: PeterMosmans.apache2
       apache2_websites:
-      - mywebsite
+      - src: .
+        name: mywebsite.conf
   vars:
     apache2_php: true
       
 ```
-This example will install and harden Apache, install and harden PHP5, deploy the file ```mywebsite.conf``` from the folder ```protected_storage``` and enable the website.
+This example will install and harden Apache, install and harden PHP5, deploy the file ```mywebsite.conf``` from the folder ```roles/apache2/files``` and enable the website.
 
 
 
