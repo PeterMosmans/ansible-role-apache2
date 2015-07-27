@@ -1,6 +1,12 @@
 ---
 # file: roles/apache2/tasks/main.yml
 
+- name: Use correct Apache security configuration filename
+  set_fact: apache2_sec_conf="{{ '/etc/apache2/conf-available/security.conf' if ((ansible_distribution == 'Debian') and (ansible_distribution_version >= '8')) else '/etc/apache2/conf.d/security' }}"
+
+- name: Use correct Apache default sitename
+  set_fact: apache2_default_site="{{ '000-default' if ((ansible_distribution == 'Debian') and (ansible_distribution_version >= '8')) else 'default' }}"
+
 - name: Install apache2
   apt:
     name=apache2
@@ -11,7 +17,7 @@
 
 - name: Harden Apache security configuration
   lineinfile:
-    dest=/etc/apache2/conf-available/security.conf
+    dest="{{ apache2_sec_conf }}"
     regexp="^{{ item.name }}"
     line="{{ item.name }} {{ item.value }}"
     state=present
@@ -27,11 +33,12 @@
     creates=/etc/apache2/conf-enabled/security.conf
   notify:
     - reload apache2
+  when: ((ansible_distribution == 'Debian') and (ansible_distribution_version >= '8'))
 
 - name: Disable the default sites
   command:
-    a2dissite 000-default
-    removes=/etc/apache2/sites-enabled/000-default.conf
+    a2dissite {{ apache2_default_site }}
+    removes=/etc/apache2/sites-enabled/{{ apache2_default_site }}.conf
   notify: 
     - restart apache2
   tags:
