@@ -31,7 +31,7 @@
 - name: Disable the default sites
   command:
     a2dissite 000-default
-    removes=/etc/apache2/sites-enabled/000-default
+    removes=/etc/apache2/sites-enabled/000-default.conf
   notify: 
     - restart apache2
   tags:
@@ -119,7 +119,9 @@
   notify:
     - restart apache2
   when: apache2_php is defined and apache2_php
-
+  tags:
+    - harden
+    
 - name: Enable php5 module
   apache2_module: name=php5 state=present
   notify:

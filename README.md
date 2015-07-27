@@ -52,6 +52,10 @@ apache2_modules_enabled:
 
 
 
+**apache2_open_basedir**: The open_basedir variable in the php.ini file. Optional, if not specified this will default to `/var/www`. See also **apache2_php_ini**.
+
+
+
 **apache2_php**: When true, PHP5 will also be installed, including the Apache PHP module
 ```
 apache2_php: false
@@ -63,7 +67,7 @@ apache2_php: false
 ```
 apache2_php_ini:
   - name: "open_basedir"
-    value: "/var/www/"
+    value: "{{ apache2_open_basedir|default('/var/www/') }}"
   - name: "expose_php"
     value: "Off"
   - name: "allow_url_fopen"
@@ -73,17 +77,17 @@ apache2_php_ini:
   - name: "enable_dl"
     value: "Off"
   - name: "display_startup_errors"
-    value: "display_startup_errors = off"
+    value: "off"
   - name: "display_errors"
-    value: "display_errors = Off"
+    value: "Off"
   - name: "log_errors"
-    value: "log_errors = On"
+    value: "On"
   - name: "assert.active"
-    value: "assert.active = 0"
+    value: "0"
   - name: "mail.add_x_header"
-    value: "mail.add_x_header = Off"
+    value: "Off"
   - name: "disable_functions"
-    value: "disable_functions = pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority"
+    value: "fsockopen,pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriorit,stream_socket_client"
 ```
 
 
