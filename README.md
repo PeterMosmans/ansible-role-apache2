@@ -1,5 +1,8 @@
 Ansible Role: Apache2
-=========
+=====================
+
+Build status for this role: [![Build Status](https://travis-ci.org/PeterMosmans/ansible-role-apache2.svg)](https://travis-ci.org/PeterMosmans/ansible-role-apache2)
+
 
 This role installs and configures the Apache 2 webserver on Debian Jessie servers. The main focus is on **hardening a default Apache installation**.
 It modifies the default Apache configuration as well as disables and enables specific modules.
