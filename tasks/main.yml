@@ -153,3 +153,4 @@
     - 443
   notify:
     - reload ufw
+  ignore_errors: yes
