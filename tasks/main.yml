@@ -1,13 +1,13 @@
 ---
 # file: roles/apache2/tasks/main.yml
 
-- name: Use correct Apache security configuration filename
+- name: Use correct Apache security configuration filename for Ubuntu and Debian
   set_fact: apache2_sec_conf="{{ '/etc/apache2/conf-available/security.conf' }}"
   when: (ansible_distribution == 'Ubuntu') or ((ansible_distribution == 'Debian') and (ansible_distribution_version >= '8'))
 
-- name: Use correct Apache security configuration filename
+- name: Use default Apache security configuration filename for other distros
   set_fact: apache2_sec_conf="{{ '/etc/apache2/conf.d/security.conf' }}"
-  when: {{ apache2_sec_conf }} is not defined
+  when: apache2_sec_conf is not defined
 
 - name: Use correct Apache default sitename
   set_fact: apache2_default_site="{{ '000-default' if ((ansible_distribution == 'Debian') and (ansible_distribution_version >= '8')) else 'default' }}"
@@ -15,9 +15,10 @@
 - name: Install apache2
   apt:
     name=apache2
-    update_cache=yes
     cache_valid_time=86400
+    force=yes
     install-recommends=no
+    update_cache=yes
     state=present
 
 - name: Harden Apache security configuration
