@@ -31,7 +31,7 @@
     line="{{ item.name }} {{ item.value }}"
     state=present
   with_items: "{{ apache2_security_conf }}"
-  when: sec_conf.exists == True
+  when: sec_conf.stat.exists == True
   notify:
     - restart apache2
   tags:
@@ -43,7 +43,7 @@
     creates=/etc/apache2/conf-enabled/security.conf
   notify:
     - reload apache2
-  when: sec_conf.exists == True
+  when: sec_conf.stat.exists == True
 
 - name: Disable the default sites
   command:
