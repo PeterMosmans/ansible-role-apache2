@@ -3,7 +3,7 @@
 
 - name: Use correct Apache security configuration filename for Ubuntu and Debian
   set_fact: apache2_sec_conf="{{ '/etc/apache2/conf-available/security.conf' }}"
-  when: ((ansible_distribution == 'Ubuntu') and (ansible_distribution_version >= '13.04' )) or ((ansible_distribution == 'Debian') and (ansible_distribution_version >= '8'))
+  when: ((ansible_distribution == 'Ubuntu') and (ansible_distribution_version >= '12.04' )) or ((ansible_distribution == 'Debian') and (ansible_distribution_version >= '8'))
 
 - name: Use default Apache security configuration filename for other distros
   set_fact: apache2_sec_conf="{{ '/etc/apache2/conf.d/security.conf' }}"
@@ -21,6 +21,9 @@
     update_cache=yes
     state=present
 
+- stat: path="{{ apache2_sec_conf }}"
+  register: sec_conf
+  
 - name: Harden Apache security configuration
   lineinfile:
     dest="{{ apache2_sec_conf }}"
@@ -28,6 +31,7 @@
     line="{{ item.name }} {{ item.value }}"
     state=present
   with_items: "{{ apache2_security_conf }}"
+  when: sec_conf.exists == True
   notify:
     - restart apache2
   tags:
@@ -39,7 +43,7 @@
     creates=/etc/apache2/conf-enabled/security.conf
   notify:
     - reload apache2
-  when: ((ansible_distribution == 'Debian') and (ansible_distribution_version >= '8'))
+  when: sec_conf.exists == True
 
 - name: Disable the default sites
   command:
@@ -50,12 +54,12 @@
   tags:
     - harden
 
-- name: Remove content of default site
-  file:
-    path={{ www_folder }}/html
-    state=absent
-  tags:
-    - harden
+#- name: Remove content of default site
+#  file:
+#    path={{ www_folder }}/html
+#    state=absent
+#  tags:
+#    - harden
 
 - name: Disable Apache modules
   command:
