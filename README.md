@@ -22,6 +22,12 @@ Role Variables
 
 Available variables are listed below, along with default values
 
+**apache2_default**: When true, the default site will *not* be disabled, and `/var/www/html` will *not* be removed. If not specified or false, the default site will be disabled, and `/var/www/html` removed.
+```
+apache2_default: false
+```
+By default, the value is not specified.
+
 
 **apache2_modules_disabled**: A list with Apache modules which will be disabled by default. The defaults can be found in ```defaults/main.yml```.
 ```
@@ -36,6 +42,7 @@ apache2_modules_disabled:
   - status
   - userdir
 ```
+
 
 
 
@@ -166,7 +173,7 @@ Please note that this role doesn't template Apache configurations - it copies co
 Dependencies
 ------------
 
-ufw has to be installed.
+None.
 
 
 
@@ -195,7 +202,7 @@ This example will install and harden Apache.
     apache2_php: true
       
 ```
-This example will install and harden Apache, install and harden PHP5, deploy the file ```mywebsite.conf``` from the folder ```roles/apache2/files``` and enable the website.
+This example will install and harden Apache, install and harden PHP5, deploy the file ```mywebsite.conf``` from the folder ```roles/apache2/files``` and enable the website. The default website will be disabled, and `/var/www/html` removed.
 
 
 

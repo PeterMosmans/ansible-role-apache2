@@ -21,6 +21,19 @@
     update_cache=yes
     state=present
 
+- block:
+  - name: Disable the default sites
+    command:
+      a2dissite {{ apache2_default_site }}
+      removes=/etc/apache2/sites-enabled/{{ apache2_default_site }}.conf
+    notify: 
+      - restart apache2
+
+  - name: Remove content of default site
+    file: path={{ www_folder }}/html state=absent
+
+  when: apache2_default is not defined or (apache2_default is defined and not apache2_default)
+
 - stat: path="{{ apache2_sec_conf }}"
   register: sec_conf
   
@@ -34,8 +47,6 @@
   when: sec_conf.stat.exists == True
   notify:
     - restart apache2
-  tags:
-    - harden
 
 - name: Enable Apache security configuration
   command:
@@ -45,21 +56,6 @@
     - reload apache2
   when: sec_conf.stat.exists == True
 
-- name: Disable the default sites
-  command:
-    a2dissite {{ apache2_default_site }}
-    removes=/etc/apache2/sites-enabled/{{ apache2_default_site }}.conf
-  notify: 
-    - restart apache2
-  tags:
-    - harden
-
-#- name: Remove content of default site
-#  file:
-#    path={{ www_folder }}/html
-#    state=absent
-#  tags:
-#    - harden
 
 - name: Disable Apache modules
   command:
@@ -73,8 +69,6 @@
   with_items: "{{ apache2_modules_disabled|default([]) }}"
   notify: 
     - restart apache2
-  tags:
-    - harden
 
 - name: Enable Apache modules
   apache2_module:
@@ -83,8 +77,6 @@
   with_items: "{{ apache2_modules_enabled|default([]) }}"
   notify: 
     - restart apache2
-  tags:
-    - harden
 
 - name: Deploy Apache configuration files
   copy:
@@ -94,8 +86,6 @@
     group=root
     mode=640
   with_items: "{{ apache2_websites|default([]) }}"
-  tags:
-    - deploy
 
 - name: Deploy SSL certificates
   copy:
@@ -117,32 +107,30 @@
     force=yes
   with_items: "{{ ssl_certificates|default([]) }}"
 
-- name: Install php5
-  apt:
-    name=php5
-    update_cache=yes
-    cache_valid_time=86400
-    install-recommends=no
-    state=present
-  when: apache2_php is defined and apache2_php
+- block:
+  - name: Install php5
+    apt:
+      name=php5
+      update_cache=yes
+      cache_valid_time=86400
+      install-recommends=no
+      state=present
 
-- name: Harden PHP configuration
-  lineinfile:
-    dest=/etc/php5/apache2/php.ini
-    regexp="^{{ item.name }}"
-    line="{{ item.name }} = {{ item.value }}"
-    state=present
-  with_items: "{{ apache2_php_ini }}"
-  notify:
-    - restart apache2
-  when: apache2_php is defined and apache2_php
-  tags:
-    - harden
-    
-- name: Enable php5 module
-  apache2_module: name=php5 state=present
-  notify:
-    - restart apache2
+  - name: Harden PHP configuration
+    lineinfile:
+      dest=/etc/php5/apache2/php.ini
+      regexp="^{{ item.name }}"
+      line="{{ item.name }} = {{ item.value }}"
+      state=present
+    with_items: "{{ apache2_php_ini }}"
+    notify:
+      - restart apache2
+
+  - name: Enable php5 module
+    apache2_module: name=php5 state=present
+    notify:
+      - restart apache2
+
   when: apache2_php is defined and apache2_php
   
 - name: Enable websites
