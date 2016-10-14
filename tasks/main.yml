@@ -123,12 +123,12 @@
       src={{ item.src }}
       dest={{ item.dest }}
       mode={{ item.mode }}
-  with_items:
-    - src: php.ini.j2
-      dest: /etc/php5/apache2/php.ini
-      mode: "0644"
-  tags:
-    - templates
+    with_items:
+      - src: php.ini.j2
+        dest: /etc/php5/apache2/php.ini
+        mode: "0644"
+    tags:
+      - templates
 
   # - name: Harden PHP configuration
   #   lineinfile:
