@@ -62,42 +62,25 @@ apache2_modules_enabled:
 
 
 
-**apache2_open_basedir**: The open_basedir variable in the php.ini file. Optional, if not specified this will default to `/var/www`. See also **apache2_php_ini**.
-
-
-
 **apache2_php**: When true, PHP5 will also be installed, including the Apache PHP module
 ```
 apache2_php: false
 ```
 
 
-
-**apache2_php_ini**: A list with php.ini settings which will be applied by default. The defaults can be found in ```defaults/main.yml```.
+If PHP5 will be installed, `php.ini` will be deployed to `/etc/php5/apache2/php.ini`. This is a template which uses lots of customizable template variables. The defaults can be found in ```defaults/main.yml```.
 ```
-apache2_php_ini:
-  - name: "open_basedir"
-    value: "{{ apache2_open_basedir|default('/var/www/') }}"
-  - name: "expose_php"
-    value: "Off"
-  - name: "allow_url_fopen"
-    value: "Off"
-  - name: "default_charset"
-    value: "\"UTF-8\""
-  - name: "enable_dl"
-    value: "Off"
-  - name: "display_startup_errors"
-    value: "off"
-  - name: "display_errors"
-    value: "Off"
-  - name: "log_errors"
-    value: "On"
-  - name: "assert.active"
-    value: "0"
-  - name: "mail.add_x_header"
-    value: "Off"
-  - name: "disable_functions"
-    value: "fsockopen,pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriorit,stream_socket_client"
+apache2_php_allow_url_fopen: "Off"
+apache2_php_assert.active: "0"
+apache2_php_default_charset: "\"UTF-8\""
+apache2_php_disable_functions:
+apache2_php_display_errors: "Off"
+apache2_php_display_startup_errors: "Off"
+apache2_php_enable_dl: "Off"
+apache2_php_expose_php: "Off"
+apache2_php_log_errors: "On"
+apache2_php_mail.add_x_header: "Off"
+apache2_php_open_basedir: "/var/www" "fsockopen,pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriorit,stream_socket_client"
 ```
 
 
@@ -166,7 +149,7 @@ www_folder: /var/www
 
 
 
-Please note that this role doesn't template Apache configurations - it copies configuration files.
+Please note that this role doesn't template Apache configurations - it copies configuration files. It does however template PHP5.
 
 
 

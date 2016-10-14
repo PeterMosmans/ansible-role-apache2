@@ -34,29 +34,31 @@
 
   when: apache2_default is not defined or (apache2_default is defined and not apache2_default)
 
-- stat: path="{{ apache2_sec_conf }}"
-  register: sec_conf
+- block:
+  - stat: path="{{ apache2_sec_conf }}"
+    register: sec_conf
   
-- name: Harden Apache security configuration
-  lineinfile:
-    dest="{{ apache2_sec_conf }}"
-    regexp="^{{ item.name }}"
-    line="{{ item.name }} {{ item.value }}"
-    state=present
-  with_items: "{{ apache2_security_conf }}"
-  when: sec_conf.stat.exists == True
-  notify:
-    - restart apache2
+  - name: Harden Apache security configuration
+    lineinfile:
+      dest="{{ apache2_sec_conf }}"
+      regexp="^{{ item.name }}"
+      line="{{ item.name }} {{ item.value }}"
+      state=present
+    with_items: "{{ apache2_security_conf }}"
+    when: sec_conf.stat.exists == True
+    notify:
+      - restart apache2
 
-- name: Enable Apache security configuration
-  command:
-    a2enconf security.conf
-    creates=/etc/apache2/conf-enabled/security.conf
-  notify:
-    - reload apache2
-  when: sec_conf.stat.exists == True
+  - name: Enable Apache security configuration
+    command:
+      a2enconf security.conf
+      creates=/etc/apache2/conf-enabled/security.conf
+    notify:
+      - reload apache2
+    when: sec_conf.stat.exists == True
 
-
+  when: apache2_security is defined or (apache2_security is defined and apache2_security)
+  
 - name: Disable Apache modules
   command:
     a2dismod -f {{ item }}
@@ -116,15 +118,27 @@
       install-recommends=no
       state=present
 
-  - name: Harden PHP configuration
-    lineinfile:
-      dest=/etc/php5/apache2/php.ini
-      regexp="^{{ item.name }}"
-      line="{{ item.name }} = {{ item.value }}"
-      state=present
-    with_items: "{{ apache2_php_ini }}"
-    notify:
-      - restart apache2
+  - name: Apply and deploy PHP template
+    template:
+      src={{ item.src }}
+      dest={{ item.dest }}
+      mode={{ item.mode }}
+  with_items:
+    - src: php.ini.j2
+      dest: /etc/php5/apache2/php.ini
+      mode: "0644"
+  tags:
+    - templates
+
+  # - name: Harden PHP configuration
+  #   lineinfile:
+  #     dest=/etc/php5/apache2/php.ini
+  #     regexp="^{{ item.name }}"
+  #     line="{{ item.name }} = {{ item.value }}"
+  #     state=present
+  #   with_items: "{{ apache2_php_ini }}"
+  #   notify:
+  #     - restart apache2
 
   - name: Enable php5 module
     apache2_module: name=php5 state=present
