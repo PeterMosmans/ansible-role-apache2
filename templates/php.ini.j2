@@ -820,7 +820,7 @@ allow_url_fopen = {{ apache2_php_allow_url_fopen }}
 
 ; Whether to allow include/require to open URLs (like http:// or ftp://) as files.
 ; http://php.net/allow-url-include
-allow_url_include = Off
+allow_url_include = {{ apache2_php_allow_url_include }}
 
 ; Define the anonymous ftp password (your email address). PHP's default setting
 ; for this is empty.
