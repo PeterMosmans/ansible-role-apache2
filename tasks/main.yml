@@ -88,6 +88,16 @@
     group=root
     mode=640
   with_items: "{{ apache2_websites|default([]) }}"
+  notify: 
+    - restart apache2
+
+- name: Deploy Apache listen template
+  template:
+    src=ports.conf.j2
+    dest=/etc/apache2/ports.conf
+    owner=root
+    group=root
+    mode="0644"
 
 - name: Deploy SSL certificates
   copy:
@@ -127,18 +137,10 @@
       - src: php.ini.j2
         dest: /etc/php5/apache2/php.ini
         mode: "0644"
+    notify: 
+      - restart apache2
     tags:
       - templates
-
-  # - name: Harden PHP configuration
-  #   lineinfile:
-  #     dest=/etc/php5/apache2/php.ini
-  #     regexp="^{{ item.name }}"
-  #     line="{{ item.name }} = {{ item.value }}"
-  #     state=present
-  #   with_items: "{{ apache2_php_ini }}"
-  #   notify:
-  #     - restart apache2
 
   - name: Enable php5 module
     apache2_module: name=php5 state=present
@@ -161,7 +163,7 @@
     proto=tcp
     port={{ item }}
   with_items:
-    - 80
+    - "{{ apache2_ports|default(['80']) }}"
     - 443
   notify:
     - reload ufw

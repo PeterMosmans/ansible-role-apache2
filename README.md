@@ -85,6 +85,13 @@ apache2_php_open_basedir: "/var/www"
 ```
 
 
+**apache2_ports**: A list on which Apache will listen. If this variable is not defined, port 80 (and 443) will be used. Example:
+```
+apache2_ports:
+  - 80
+  - 8000
+```
+
 
 **apache2_security_conf**: A list with security.conf settings which will be applied by default. The defaults can be found in ```defaults/main.yml```.
 ```
