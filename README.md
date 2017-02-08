@@ -112,13 +112,12 @@ apache2_security_conf:
 
 
 
-**apache2_websites**: An optional list containing the location (```src```) and name (```name```) of website configuration files. Please note that the location is relative from the apache2 ```role/files``` subfolder. For instance, if you want to include a file from within another role ```myrole/files```, you should use the following:
+**apache2_websites**: An optional list with Apache configuration files. The `src` points to the Jinja2 file, the `dest` will be the resulting website configuration file.
+Example:
 ```
 apache2_websites:
-  - src: ../../myrole/files
-    name: www.mysite.com.conf
-
-
+  - src: mywebsited.conf.j2
+    name: mywebsite.conf
 ```
 By default, the list is empty.
 

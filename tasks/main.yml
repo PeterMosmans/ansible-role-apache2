@@ -80,14 +80,16 @@
   notify: 
     - restart apache2
 
-- name: Deploy Apache configuration files
-  copy:
-    src={{ item.src }}/{{ item.name }}
+- name: Apply and deploy Apache template
+  template:
+    src={{ item.src }}
     dest=/etc/apache2/sites-available/{{ item.name }}
     owner=root
     group=root
     mode=640
   with_items: "{{ apache2_websites|default([]) }}"
+  tags:
+    - templates
   notify: 
     - restart apache2
 
