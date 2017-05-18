@@ -190,7 +190,6 @@ This example will install and harden Apache.
         name: mywebsite.conf
   vars:
     apache2_php: true
-      
 ```
 This example will install and harden Apache, install and harden PHP5, deploy the file ```mywebsite.conf``` from the folder ```roles/apache2/files``` and enable the website. The default website will be disabled, and `/var/www/html` removed.
 
