@@ -15,7 +15,6 @@
 - name: Install apache2
   apt:
     name=apache2
-    cache_valid_time=86400
     force=yes
     install-recommends=no
     update_cache=yes
@@ -26,7 +25,7 @@
     command:
       a2dissite {{ apache2_default_site }}
       removes=/etc/apache2/sites-enabled/{{ apache2_default_site }}.conf
-    notify: 
+    notify:
       - restart apache2
 
   - name: Remove content of default site
@@ -37,7 +36,7 @@
 - block:
   - stat: path="{{ apache2_sec_conf }}"
     register: sec_conf
-  
+
   - name: Harden Apache security configuration
     lineinfile:
       dest="{{ apache2_sec_conf }}"
@@ -58,26 +57,25 @@
     when: sec_conf.stat.exists == True
 
   when: apache2_security is defined or (apache2_security is defined and apache2_security)
-  
+
 - name: Disable Apache modules
-  command:
-    a2dismod -f {{ item }}
-    removes=/etc/apache2/mods-enabled/{{ item }}
-#  apache2_module:
-#    name={{ item }}
-#    force_disable=yes
-#    state=absent
-    
+  apache2_module:
+    name: "{{ item }}"
+    force: true
+    ignore_configcheck: true
+    state: absent
   with_items: "{{ apache2_modules_disabled|default([]) }}"
-  notify: 
+  notify:
     - restart apache2
+  # force is 2.1+, ignore_configcheck is 2.3+
+  ignore_errors: true
 
 - name: Enable Apache modules
   apache2_module:
-    name={{ item }}
-    state=present
+    name: "{{ item }}"
+    state: present
   with_items: "{{ apache2_modules_enabled|default([]) }}"
-  notify: 
+  notify:
     - restart apache2
 
 - name: Apply and deploy Apache template
@@ -90,7 +88,7 @@
   with_items: "{{ apache2_websites|default([]) }}"
   tags:
     - templates
-  notify: 
+  notify:
     - restart apache2
 
 - name: Deploy Apache listen template
@@ -122,13 +120,16 @@
   with_items: "{{ ssl_certificates|default([]) }}"
 
 - block:
-  - name: Install php5
+  - name: Install PHP5
     apt:
-      name=php5
-      update_cache=yes
-      cache_valid_time=86400
-      install-recommends=no
-      state=present
+      name: "{{ item }}"
+      update_cache: yes
+      cache_valid_time: 86400
+      install-recommends: no
+      state: present
+    with_items:
+      - libapache2-mod-php5
+      - php5
 
   - name: Apply and deploy PHP template
     template:
@@ -139,7 +140,7 @@
       - src: php.ini.j2
         dest: /etc/php5/apache2/php.ini
         mode: "0644"
-    notify: 
+    notify:
       - restart apache2
     tags:
       - templates
@@ -150,7 +151,7 @@
       - restart apache2
 
   when: apache2_php is defined and apache2_php
-  
+
 - name: Enable websites
   command:
     a2ensite {{ item.name }}
