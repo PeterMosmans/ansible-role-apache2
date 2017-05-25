@@ -10,17 +10,17 @@ Furthermore it can deploy (a number of) website configuration files, SSL certifi
 By setting the ```apache2_php``` flag to true, PHP5 will also be installed and configured.
 Note that it will not be removed or disabled by setting the ```apache2_php``` flag to false. This can be done for instance by adding the php module to the ```apache2_modules_disabled``` list.
 
-By default, the default website configuration will be disabled, and content of the default site (/var/www/html) will be **removed**.
 
 Requirements
 ------------
 
 The installation of ufw (the uncomplicated firewall, a frontend for iptables).
 
+
 Role Variables
 --------------
 
-Available variables are listed below, along with default values
+Available variables are listed below, along with default values.
 
 **apache2_default**: When true, the default site will *not* be disabled, and `/var/www/html` will *not* be removed. If not specified or false, the default site will be disabled, and `/var/www/html` removed.
 ```

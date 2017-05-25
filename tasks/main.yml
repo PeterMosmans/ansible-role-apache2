@@ -20,17 +20,12 @@
     update_cache=yes
     state=present
 
-- block:
-  - name: Disable the default sites
-    command:
-      a2dissite {{ apache2_default_site }}
-      removes=/etc/apache2/sites-enabled/{{ apache2_default_site }}.conf
-    notify:
-      - restart apache2
-
-  - name: Remove content of default site
-    file: path={{ www_folder }}/html state=absent
-
+- name: Disable the default sites
+  command:
+    a2dissite {{ apache2_default_site }}
+    removes=/etc/apache2/sites-enabled/{{ apache2_default_site }}.conf
+  notify:
+    - restart apache2
   when: apache2_default is not defined or (apache2_default is defined and not apache2_default)
 
 - block:
