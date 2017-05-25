@@ -33,7 +33,7 @@ apache2_php_enable_dl: "Off"
 apache2_php_expose_php: "Off"
 apache2_php_log_errors: "On"
 apache2_php_mail_add_x_header: "Off"
-apache2_php_open_basedir: "/var/www" 
+apache2_php_open_basedir: "/dev/urandom:/var/www"
 apache2_security_conf:
   - name: "Header set X-Content-Type-Options:"
     value: "\"nosniff\""
