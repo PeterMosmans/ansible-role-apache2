@@ -4,11 +4,18 @@ Ansible Role: Apache2
 Build status for this role: [![Build Status](https://travis-ci.org/PeterMosmans/ansible-role-apache2.svg)](https://travis-ci.org/PeterMosmans/ansible-role-apache2)
 
 
-This role installs and configures the Apache 2 webserver on Debian and Ubuntu servers. The main focus is on **hardening a default Apache installation**.
-It modifies the default Apache configuration as well as disables and enables specific modules.
-Furthermore it can deploy (a number of) website configuration files, SSL certificates and corresponding private keys.
-By setting the ```apache2_php``` flag to true, PHP5 will also be installed and configured.
-Note that it will not be removed or disabled by setting the ```apache2_php``` flag to false. This can be done for instance by adding the php module to the ```apache2_modules_disabled``` list.
+This role installs and configures the Apache 2 webserver on Debian and Ubuntu
+servers. The main focus is on **hardening a default Apache installation**. It
+modifies the default Apache configuration as well as disables and enables
+specific modules. Furthermore it can deploy (a number of) website configuration
+files, SSL certificates and corresponding private keys.
+
+By setting the
+```apache2_php``` flag to true, PHP will also be installed and configured.
+
+Note that PHP will not be removed or disabled by setting the ```apache2_php```
+flag to false. This can be done for instance by adding the php module to the
+```apache2_modules_disabled``` list.
 
 
 Requirements
@@ -62,13 +69,25 @@ apache2_modules_enabled:
 
 
 
-**apache2_php**: When true, PHP5 will also be installed, including the Apache PHP module
+**apache2_php**: When true, PHP will also be installed, including the Apache PHP
+module
 ```
 apache2_php: false
 ```
 
 
-If PHP5 will be installed, `php.ini` will be deployed to `/etc/php5/apache2/php.ini`. This is a template which uses lots of customizable template variables. The defaults can be found in ```defaults/main.yml```.
+**apache2_php_version**: The PHP version. The default can be found in
+```defaults/main.yml```.
+```
+apache2_php_version: 7.0
+
+```
+
+
+
+If PHP will be installed, `php.ini` will be deployed to
+`/etc/php/[apache2_php_version]/apache2/php.ini`. This is a template which uses lots of
+customizable template variables. The defaults can be found in ```defaults/main.yml```.
 ```
 apache2_php_allow_url_fopen: "Off"
 apache2_php_allow_url_include: "Off"
@@ -156,7 +175,7 @@ www_folder: /var/www
 
 
 
-Please note that this role doesn't template Apache configurations - it copies configuration files. It does however template PHP5.
+Please note that this role doesn't template Apache configurations - it copies configuration files. It does however template PHP.
 
 
 
@@ -191,7 +210,7 @@ This example will install and harden Apache.
   vars:
     apache2_php: true
 ```
-This example will install and harden Apache, install and harden PHP5, deploy the file ```mywebsite.conf``` from the folder ```roles/apache2/files``` and enable the website. The default website will be disabled, and `/var/www/html` removed.
+This example will install and harden Apache, install and harden PHP, deploy the file ```mywebsite.conf``` from the folder ```roles/apache2/files``` and enable the website. The default website will be disabled, and `/var/www/html` removed.
 
 
 

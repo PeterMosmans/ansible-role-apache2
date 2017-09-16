@@ -34,6 +34,7 @@ apache2_php_expose_php: "Off"
 apache2_php_log_errors: "On"
 apache2_php_mail_add_x_header: "Off"
 apache2_php_open_basedir: "/dev/urandom:/var/www"
+apache2_php_version: "7.0"
 apache2_security_conf:
   - name: "Header set X-Content-Type-Options:"
     value: "\"nosniff\""
