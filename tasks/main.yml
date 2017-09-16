@@ -139,6 +139,22 @@
       - restart apache2
     tags:
       - templates
+    ignore_errors: true
+
+  - name: Apply and deploy PHP template (use backwards compatible path)
+    template:
+      src={{ item.src }}
+      dest={{ item.dest }}
+      mode={{ item.mode }}
+    with_items:
+      - src: php.ini.j2
+        dest: /etc/php{{ apache2_php_version}}/apache2/php.ini
+        mode: "0644"
+    notify:
+      - restart apache2
+    tags:
+      - templates
+    ignore_errors: true
 
   - name: Enable php module
     apache2_module: name=php{{ apache2_php_version}} state=present
