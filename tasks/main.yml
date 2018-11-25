@@ -28,8 +28,10 @@
     - restart apache2
   when: apache2_default is not defined or (apache2_default is defined and not apache2_default)
 
-- block:
-  - stat: path="{{ apache2_sec_conf }}"
+- name: Apache security
+  block:
+  - name: Checking file
+    stat: path="{{ apache2_sec_conf }}"
     register: sec_conf
 
   - name: Harden Apache security configuration
