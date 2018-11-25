@@ -81,7 +81,7 @@
     dest=/etc/apache2/sites-available/{{ item.name }}
     owner=root
     group=root
-    mode=640
+    mode=0640
   with_items: "{{ apache2_websites|default([]) }}"
   tags:
     - templates
@@ -94,7 +94,7 @@
     dest=/etc/apache2/ports.conf
     owner=root
     group=root
-    mode="0644"
+    mode=0644
 
 - name: Deploy SSL certificates
   copy:
@@ -102,7 +102,7 @@
     dest=/etc/ssl/certs/{{ item }}.cer
     owner=root
     group=root
-    mode=644
+    mode=0644
     force=yes
   with_items: "{{ ssl_certificates|default([]) }}"
 
@@ -112,7 +112,7 @@
     dest=/etc/ssl/private/{{ item }}.key
     owner=root
     group=root
-    mode=600
+    mode=0600
     force=yes
   with_items: "{{ ssl_certificates|default([]) }}"
 
@@ -136,7 +136,7 @@
     with_items:
       - src: php.ini.j2
         dest: /etc/php/{{ apache2_php_version}}/apache2/php.ini
-        mode: "0644"
+        mode: 0644
     notify:
       - restart apache2
     tags:
@@ -151,7 +151,7 @@
     with_items:
       - src: php.ini.j2
         dest: /etc/php{{ apache2_php_version}}/apache2/php.ini
-        mode: "0644"
+        mode: 0644
     notify:
       - restart apache2
     tags:
